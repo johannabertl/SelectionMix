@@ -1,0 +1,10 @@
+Package: rnegbinmix
+Type: Package
+Title: Estimation in a negative binomial mixture model
+Version: 0.1
+Date: 2016-03-23
+Author: Johanna Bertl
+Maintainer: Johanna Bertl <johanna.bertl@clin.au.dk>
+Description: More about what it does (maybe more than one line)
+LazyData: TRUE
+Depends: MASS
