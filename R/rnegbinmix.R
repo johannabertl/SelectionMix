@@ -15,6 +15,38 @@
 #'
 #'
 #' @author Johanna Bertl
+#'
+#' @examples
+#'
+#' # Test the negative binomial density function and how well it fits to simulated values
+#'
+#' k = 0:20
+#' density = dnegbin.alphabeta(k=0:20, alpha=10, beta=5)
+#'
+#' simulated = rnegbin.alphabeta(1000, alpha=10, beta=5)
+#' plot(table(simulated)/1000)
+#'
+#' lines(k, density, col="purple")
+#'
+#'
+#' # Same for a mixture of two negative binomial densities
+#'
+#' k = 0:50
+#' c1 = 0.5; c2 = 10
+#' p1 = 0.2; p2 = 0.8
+#' alpha = 10
+#' beta = 5
+#'
+#' density1 = dnegbin.alphabeta(k = k, alpha = alpha, beta = beta/c1)
+#' plot(k, density1, t="b")
+#' density2 = dnegbin.alphabeta(k = k, alpha = alpha, beta = beta/c2)
+#' plot(k, density2, t="b")
+#' density.mixture = p1 * density1 + p2 * density2
+#' plot(k, density.mixture, t="b")
+#'
+#' simulated.mixture = rnegbinmix(1000, alpha = alpha, beta = beta, c = c(c1, c2), p = c(p1, p2))
+#' plot(table(simulated.mixture)/1000)
+#' lines(k, density.mixture, col="purple")
 
 rnegbinmix = function(n, alpha, beta, c, p){
   if(!all(p>0)){
@@ -31,10 +63,21 @@ rnegbinmix = function(n, alpha, beta, c, p){
   # simulate pi (for the mixing)
   pi = sample(x = c, size=n, replace=T, prob = p)
   # simulate from the negative binomial mixture distribution
-  rnegbin(n, mu=1/(beta/pi + 1), theta = alpha)
+  rnegbin.alphabeta(n, alpha, beta/pi)
 }
 
 
 dnegbin = function(k, r, p){
   choose(k + r - 1, k)*((1 - p)**r)*(p**k)
+}
+
+dnegbin.alphabeta = function(k, alpha, beta){
+  dnegbin(k, r = alpha, p = 1/(beta + 1))
+}
+
+rnegbin.alphabeta = function(n, alpha, beta){
+  # simulate lamda from a Gamma distribution
+  lambda = rgamma(n, shape = alpha, rate = beta)
+  # simulate negative binomial from a Poisson(lambda) distribution
+  rpois(n, lambda)
 }

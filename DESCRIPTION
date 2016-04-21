@@ -7,4 +7,4 @@ Author: Johanna Bertl
 Maintainer: Johanna Bertl <johanna.bertl@clin.au.dk>
 Description: More about what it does (maybe more than one line)
 LazyData: TRUE
-Depends: MASS
+Depends:
