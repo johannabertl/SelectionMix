@@ -6,14 +6,14 @@
 #'
 #' In the M step, contrained optimization is conducted with the constrOptim function. ui and ci are defined accordingly (see \link{constrOptim}): ui %*% theta - ci >= 0.
 #'
-#' @param theta.null
-#' @param x.syn
-#' @param x.non
-#' @param c1
-#' @param c2
-#' @param iter
-#' @param ui
-#' @param ci
+#' @param theta.null Starting value, vector consisting of alpha, beta, p1.
+#' @param x.syn Vector of synonymous mutation counts per gene.
+#' @param x.non Vector of non-synonymous mutation counts per gene.
+#' @param c1 Parameter c1.
+#' @param c2 Parameter c2.
+#' @param iter Number of iterations
+#' @param ui Linear constraints for theta. See details and examples.
+#' @param ci Linear constraints for theta. See details and examples.
 #'
 #' @author Johanna Bertl
 #'
@@ -21,8 +21,12 @@
 #' \describe{
 #'  \item{theta}{Matrix with the trajectories of the parameter values}
 #'  \item{Q}{Vector with the trajectory of the Q values}
-#'  \item{convergence}{Vector with the convergence code for each iteration of the M-part of the algorithm, see \link{stats::optim} (0 indicates successful completion).}
+#'  \item{convergence}{Vector with the convergence code for each iteration of the M-step of the algorithm, see \code{\link{stats::optim}} (0 indicates successful completion).}
 #' }
+#'
+#' @seealso
+#'
+#' \code{\link{rnegbinmix::EM_random}} for a wrapper function with randomly drawn starting values.
 #'
 #' @examples
 #'

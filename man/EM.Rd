@@ -7,27 +7,27 @@
 EM(theta.null, x.syn, x.non, c1, c2, iter, ui, ci)
 }
 \arguments{
-\item{theta.null}{}
+\item{theta.null}{Starting value, vector consisting of alpha, beta, p1.}
 
-\item{x.syn}{}
+\item{x.syn}{Vector of synonymous mutation counts per gene.}
 
-\item{x.non}{}
+\item{x.non}{Vector of non-synonymous mutation counts per gene.}
 
-\item{c1}{}
+\item{c1}{Parameter c1.}
 
-\item{c2}{}
+\item{c2}{Parameter c2.}
 
-\item{iter}{}
+\item{iter}{Number of iterations}
 
-\item{ui}{}
+\item{ui}{Linear constraints for theta. See details and examples.}
 
-\item{ci}{}
+\item{ci}{Linear constraints for theta. See details and examples.}
 }
 \value{
 \describe{
  \item{theta}{Matrix with the trajectories of the parameter values}
  \item{Q}{Vector with the trajectory of the Q values}
- \item{convergence}{Vector with the convergence code for each iteration of the M-part of the algorithm, see \link{stats::optim} (0 indicates successful completion).}
+ \item{convergence}{Vector with the convergence code for each iteration of the M-step of the algorithm, see \code{\link{stats::optim}} (0 indicates successful completion).}
 }
 }
 \description{
@@ -62,5 +62,8 @@ matplot(EMres$theta)
 }
 \author{
 Johanna Bertl
+}
+\seealso{
+\code{\link{rnegbinmix::EM_random}} for a wrapper function with randomly drawn starting values.
 }
 
