@@ -7,11 +7,11 @@
 rnegbinmix_syn_nonsyn(n, alpha, beta, c, p)
 }
 \arguments{
-\item{n}{}
+\item{n}{number of genes}
 
-\item{alpha,}{scalar, positive}
+\item{alpha}{scalar, positive}
 
-\item{beta}{positive}
+\item{beta}{scalar, positive}
 
 \item{c}{numeric, positive, length k}
 
@@ -22,8 +22,16 @@ rnegbinmix_syn_nonsyn simulates counts of synonymous and non-synonymous mutation
 }
 \details{
 The function \link{MASS::rnegbin} from package MASS is used for the simulation of negative binomial data. The function \link{rnegbinmix} is used for the negative binomial mixture.
+}
+\examples{
+# Mixture with 3 components
 
-Currently, only a mixture of two components is implemented for the non-synonymous mutations.
+c1 = 0.01; c2 = 1; c3=100
+p1 = 0.33; p2 = 0.33; p3 = 0.34
+alpha = 10
+beta = 5
+
+simulated.mixture = rnegbinmix_syn_nonsyn(1000, alpha = alpha, beta = beta, c = c(c1, c2, c3), p = c(p1, p2, p3))
 }
 \author{
 Johanna Bertl

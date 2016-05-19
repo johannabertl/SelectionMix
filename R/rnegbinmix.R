@@ -1,8 +1,6 @@
 #' Simulating data from a negative binomial mixture distribution
 #'
-#' rnegbinmix simulates data from a negative binomial mixture distribution.
-#'
-#' The negative binomial mixture is defined as follows:
+#' rnegbinmix simulates data from a negative binomial mixture distribution with k components.
 #'
 #' The function \code{rnegbin} from package MASS is used for the simulation of negative binomial data.
 #'
@@ -45,6 +43,28 @@
 #' plot(k, density.mixture, t="b")
 #'
 #' simulated.mixture = rnegbinmix(1000, alpha = alpha, beta = beta, c = c(c1, c2), p = c(p1, p2))
+#' plot(table(simulated.mixture)/1000)
+#' lines(k, density.mixture, col="purple")
+#'
+#'
+#' # Mixture with 3 components
+#'
+#' k = 0:500
+#' c1 = 0.01; c2 = 1; c3=100
+#' p1 = 0.33; p2 = 0.33; p3 = 0.34
+#' alpha = 10
+#' beta = 5
+#'
+#' density1 = dnegbin.alphabeta(k = k, alpha = alpha, beta = beta/c1)
+#' plot(k, density1, t="l")
+#' density2 = dnegbin.alphabeta(k = k, alpha = alpha, beta = beta/c2)
+#' plot(k, density2, t="l")
+#' density3 = dnegbin.alphabeta(k = k, alpha = alpha, beta = beta/c3)
+#' plot(k, density3, t="l")
+#' density.mixture = p1 * density1 + p2 * density2 + p3 * density3
+#' plot(k, density.mixture, t="l")
+#'
+#' simulated.mixture = rnegbinmix(1000, alpha = alpha, beta = beta, c = c(c1, c2, c3), p = c(p1, p2, p3))
 #' plot(table(simulated.mixture)/1000)
 #' lines(k, density.mixture, col="purple")
 

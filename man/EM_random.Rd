@@ -4,11 +4,17 @@
 \alias{EM_random}
 \title{Wrapper function with random starting values for the EM algorithm}
 \usage{
-EM_random(theta.null, nstart, x.syn, x.non, c1, c2, iter, ui, ci,
-  parallel = F)
+EM_random(alpha.interval, beta.interval, pvec, precision, nstart, x.syn, x.non,
+  cvec, iter, epsilon = NULL, ui, ci, parallel = F)
 }
 \arguments{
-\item{theta.null}{3x2 matrix, with minimal value in column one, maximal value in column 2, alpha, beta, p1 in lines 1-3.}
+\item{alpha.interval}{}
+
+\item{beta.interval}{}
+
+\item{pvec}{vector of length k-1}
+
+\item{precision}{positive integer to determine the variance of the multinomial draws (see details).}
 
 \item{nstart}{Integer. Number of random starting values}
 
@@ -20,7 +26,10 @@ The other parameters are the same as in \code{\link{rnegbinmix::EM}}.}
 A list consisting of \code{nstart} objects, each one a list just like the output of EM (trajectory of theta, Q and convergence code), see \code{\link{rnegbinmix::EM}}.
 }
 \description{
-The function EM is called multiple times, each time with a random starting value drawn from a uniform distribution on a user-defined hypercube.
+The function EM is called multiple times, each time with a random starting value
+}
+\details{
+The starting values for the parameters alpha and beta are drawn from a uniform distribution on two user-defined intervals. The starting values for p1, ..., pk-1 are drawn from a multinomial distribution. The variance of the multinomial distribution is determined by the parameter \code{precision}: a multinomial sample of the size \code{precision} is drawn with the function \code{rmultinom}, afterwards the multinomial sample is scaled to sum up to one. The larger \code{precision}, the smaller the variance.
 }
 \examples{
 # Simulate dataset of synonymous and non-synonymous mutations
@@ -41,11 +50,14 @@ ui = rbind(c(1, 0, 0), c(0, 1, 0), c(0, 0, 1), c(0, 0, -1))
 ci = c(0, 0, 0, -1)
 
 # Starting values
-theta.null = matrix(c(1, 1, 0.05, 20, 10, 0.5), ncol=2, nrow=3, byrow=F)
+alpha.interval = c(1, 20)
+beta.interval = c(1, 10)
+pvec = p1
+precision=20
 nstart = 5
 
 # Run EM algorithm
-EMres = EM_random(theta.null = theta.null, nstart=nstart, x.syn = mutations$Syn, x.non = mutations$Non, c1 = c1, c2 = c2, iter=25, ui = ui, ci=ci, parallel=T)
+EMres = EM_random(alpha.interval = alpha.interval, beta.interval = beta.interval, pvec = pvec, precision = precision, nstart=nstart, x.syn = mutations$Syn, x.non = mutations$Non, cvec=c(c1, c2), iter=25, ui = ui, ci=ci, parallel=T)
 
 # Plot results
 par(mfrow=c(3,2))

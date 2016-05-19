@@ -1,46 +1,82 @@
-#' The function Q for the negative binomial mixture model
+#' The function Q for the EM algorithm for the negative binomial mixture model
 #'
-#' Currently only for mixtures of 2 negbinoms.
+#' The function negQ = -Q can be used for minimization.
 #'
-#' The function negQ is -Q (for minimization).
-#'
-#' The function Q_fixed_prop is for the function EM_fixed_prop, where the mixture proportions are assumed fixed. Here, theta = c(alpha, beta).
-#'
-#' @param theta c(alpha, beta, p1)
-#' @param theta.prime c(alpha.prime, beta.prime, p1.prime)
+#' @param theta c(alpha, beta, p1, p2, ..., pk-1)
+#' @param theta.prime c(alpha.prime, beta.prime, p1.prime, p2.prime, ..., p(k-1).prime)
 #' @param x.syn vector of synonymous mutation count
 #' @param x.non vector of non-synonymous mutation count
-#' @param c1 positive scalar
-#' @param c2 positive scalar
+#' @param cvec vector of k positive values c(c1, ..., ck)
 #'
 #' @author Johanna Bertl
+#'
+#' @examples
+#'
+#' ### Example with 2 components ###
+#'
+#' # Simulate dataset of synonymous and non-synonymous mutations
+#'
+#' c1 = 0.5; c2 = 10
+#' p1 = 0.2; p2 = 0.8
+#' alpha = 10
+#' beta = 5
+#'
+#' mutations = rnegbinmix_syn_nonsyn(n=3000, alpha=alpha, beta=beta, c=c(c1, c2), p = c(p1, p2))
+#'
+#' # Q
+#'
+#' Qtest = Q(theta = c(5, 1, 0.5), theta.prime = c(5, 1, 0.5), x.syn = mutations$Syn, x.non = mutations$Non, c = c(c1, c2))
+#'
+#'
+#' ### Example with 3 components ###
+#'
+#' c1 = 0.01; c2 = 1; c3 = 100
+#' p1 = 0.33; p2 = 0.33; p3 = 0.34
+#' alpha = 10
+#' beta = 5
+#'
+#' mutations = rnegbinmix_syn_nonsyn(n=3000, alpha=alpha, beta=beta, c=c(c1, c2, c3), p = c(p1, p2, p3))
+#'
+#' # Q
+#'
+#' Qtest = Q(theta = c(5, 1, 0.3, 0.3), theta.prime = c(5, 1, 0.3, 0.3), x.syn = mutations$Syn, x.non = mutations$Non, c = c(c1, c2, c3))
 
-Q = function(theta, theta.prime, x.syn, x.non, c1, c2){
+Q = function(theta, theta.prime, x.syn, x.non, cvec){
 
-  # Parameters:
+  ### Preparing parameters ###
+
+  # Model parameters:
 
   alpha = theta[1]
   beta = theta[2]
-  p1 = theta[3]
-  p2 = 1-p1
+  p = theta[3:length(theta)]
+  p = c(p, 1-sum(p))
+
+  # Model parameters of the previous step (theta prime)
 
   alpha.prime = theta.prime[1]
   beta.prime = theta.prime[2]
-  p1.prime = theta.prime[3]
-  p2.prime = 1-p1.prime
+  p.prime = theta.prime[3:length(theta.prime)]
+  p.prime = c(p.prime, 1-sum(p.prime))
 
-  n = length(x.syn)
+  # further parameters
+
+  n = length(x.syn) # number of genes
+  k = length(p) # number of mixture components
 
 
-  # q1 and q2 (vectors)
+  #### Computation of the expected log-likelihood ####
 
-  q1.el1 = ( (1 - (1/(beta.prime/c1 + 1)))^alpha.prime ) *
-    ( (beta.prime/c1 + 1)^(-x.non) ) * p1.prime
-  q1.el2 = ( (1 - (1/(beta.prime/c2 + 1)))^alpha.prime ) *
-    ( (beta.prime/c2 + 1)^(-x.non) ) * p2.prime
+  # matrix qmat consisting of columns q1, q2, ..., qk
 
-  q1 = q1.el1/(q1.el1 + q1.el2)
-  q2 = 1 - q1
+  qmat.temp = matrix(NA, ncol=k, nrow=n)
+
+  for(i in 1:k){
+    qmat.temp[,i] = ( (1 - (1/(beta.prime/cvec[i] + 1)))^alpha.prime ) *
+      ( (beta.prime/cvec[i] + 1)^(-x.non) ) * p.prime[i]
+  }
+
+  qmat = qmat.temp/rowSums(qmat.temp)
 
 
   # expected log likelihood of x.syn
@@ -50,10 +86,19 @@ Q = function(theta, theta.prime, x.syn, x.non, c1, c2){
 
   # expected log likelihood of x.non
 
-  summand1 = log(dnegbin(x.non, alpha, 1/(beta/c1 + 1))*p1)*q1
-  summand2 = log(dnegbin(x.non, alpha, 1/(beta/c2 + 1))*p2)*q2
+  summand = numeric(k)
+  for(i in 1:k){
+    vec = dnegbin(x.non, alpha, 1/(beta/cvec[i] + 1))*p[i]
+    # if the entries of vec are too small, the logarithm can't be computed (in the next step), so they are replaced by the smallest possible value.
+    if(!all(vec>=10^(-323))){
+      num = sum(vec<10^(-323))
+      warning(paste0("In component ", i, ", the log-likelihood of the non-synonymous mutations had to be approximated, because the likelihood contains ", num, " entries that are too small to compute the log."))
+      vec = ifelse(vec<10^(-323), 10^(-323), vec)
+    }
+    summand[i] = sum(log(vec)*qmat[,i])
+  }
 
-  ll.x.non = sum(summand1 + summand2)
+  ll.x.non = sum(summand)
 
 
   # Q
@@ -64,6 +109,6 @@ Q = function(theta, theta.prime, x.syn, x.non, c1, c2){
 }
 
 
-negQ = function(theta, theta.prime, x.syn, x.non, c1, c2) {
-  -Q(theta, theta.prime, x.syn, x.non, c1, c2)
+negQ = function(theta, theta.prime, x.syn, x.non, cvec){
+  -Q(theta, theta.prime, x.syn, x.non, cvec)
 }

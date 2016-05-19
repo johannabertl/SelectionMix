@@ -4,20 +4,20 @@
 \alias{EM}
 \title{EM algorithm for the negative binomial mixture model}
 \usage{
-EM(theta.null, x.syn, x.non, c1, c2, iter, ui, ci)
+EM(theta.null, x.syn, x.non, cvec, iter, epsilon = NULL, ui, ci)
 }
 \arguments{
-\item{theta.null}{Starting value, vector consisting of alpha, beta, p1.}
+\item{theta.null}{Starting value, vector consisting of alpha, beta, p1, ..., pk-1.}
 
 \item{x.syn}{Vector of synonymous mutation counts per gene.}
 
 \item{x.non}{Vector of non-synonymous mutation counts per gene.}
 
-\item{c1}{Parameter c1.}
+\item{cvec}{Parameter vector c1, ..., ck.}
 
-\item{c2}{Parameter c2.}
+\item{iter}{Maximum number of iterations.}
 
-\item{iter}{Number of iterations}
+\item{epsilon}{Log-likelihood difference stopping criterion. If NULL, the algorithm is run for \code{iter} iterations. Otherwise, it is run until the increase in the log-likelihood is smaller than \code{epsilon}, but at most for \code{iter} iterations.}
 
 \item{ui}{Linear constraints for theta. See details and examples.}
 
@@ -25,20 +25,25 @@ EM(theta.null, x.syn, x.non, c1, c2, iter, ui, ci)
 }
 \value{
 \describe{
- \item{theta}{Matrix with the trajectories of the parameter values}
- \item{Q}{Vector with the trajectory of the Q values}
+ \item{theta}{Matrix with the trajectories of the parameter values.}
+ \item{Q}{Vector with the trajectory of the Q values.}
+ \item{loglikelihood}{Vector with the trajectory of the log likelihood values.}
  \item{convergence}{Vector with the convergence code for each iteration of the M-step of the algorithm, see \code{\link{stats::optim}} (0 indicates successful completion).}
 }
 }
 \description{
-EM algorithm to estimate the parameters of the negative binomial mixture model. Currently only for mixtures of 2 negbinoms as defined in \link{negbinmix::rnegbinmix}.
+EM algorithm to estimate the parameters of a negative binomial mixture model with k components.
 }
 \details{
-The parameters alpha, beta and p1 are estimated. p2 = 1-p2. c1 and c2 are fixed.
+The parameters alpha, beta and p1, ..., pk-1 are estimated. pk = 1 - p1 - ... -pk-1. c1, ..., ck are fixed.
 
-In the M step, contrained optimization is conducted with the constrOptim function. ui and ci are defined accordingly (see \link{constrOptim}): ui %*% theta - ci >= 0.
+In the M step, constrained optimization is conducted with the function \code{constrOptim}. \code{ui} and \code{ci} are defined accordingly (see \link{constrOptim}): \code{ui \%*\% theta - ci >= 0}. It is important that ui and ci are specified such that p is a probability vector, see examples.
+
+As a stopping criterion, the difference in log-likelihood can be used. To make sure that there is always at least a short trajectory for visual checks, the criterion is only used after at least 5 iterations.
 }
 \examples{
+### Example with 2 components ###
+
 # Simulate dataset of synonymous and non-synonymous mutations
 
 c1 = 0.5; c2 = 10
@@ -47,6 +52,9 @@ alpha = 10
 beta = 5
 
 mutations = rnegbinmix_syn_nonsyn(n=3000, alpha=alpha, beta=beta, c=c(c1, c2), p = c(p1, p2))
+
+# function Q
+Qtest = Q(theta = c(5, 1, 0.5), theta.prime = c(5, 1, 0.5), x.syn = mutations$Syn, x.non = mutations$Non, cvec = c(c1, c2))
 
 # EM algorithm
 
@@ -57,8 +65,36 @@ ui = rbind(c(1, 0, 0), c(0, 1, 0), c(0, 0, 1), c(0, 0, -1))
 ci = c(0, 0, 0, -1)
 
 # EM algorithm
-EMres = EM(theta.null = c(5, 1, 0.5), x.syn = mutations$Syn, x.non = mutations$Non, c1 = c1, c2 = c2, iter=25, ui = ui, ci=ci)
-matplot(EMres$theta)
+EMres = EM(theta.null = c(5, 1, 0.5), x.syn = mutations$Syn, x.non = mutations$Non, cvec=c(c1, c2), iter=25, epsilon = 10^(-8), ui = ui, ci=ci)
+matplot(EMres$theta, t="b")
+plot(EMres$loglikelihood, t="b")
+
+
+### Example with 3 components ####
+
+c1 = 0.01; c2 = 1; c3 = 100
+p1 = 0.33; p2 = 0.33; p3 = 0.34
+alpha = 10
+beta = 5
+
+mutations = rnegbinmix_syn_nonsyn(n=3000, alpha=alpha, beta=beta, c=c(c1, c2, c3), p = c(p1, p2, p3))
+
+# Q
+
+Qtest = Q(theta = c(5, 1, 0.33, 0.33), theta.prime = c(5, 1, 0.33, 0.33), x.syn = mutations$Syn, x.non = mutations$Non, c = c(c1, c2, c3))
+
+# EM algorithm
+
+# Constraints: ui \%*\% theta - ci >= 0
+# alpha > 0, beta > 0, 0 <= p1, p2 <=1, p1 + p2 <= 1
+
+ui = rbind(c(1, 0, 0, 0), c(0, 1, 0, 0), c(0, 0, 1, 0), c(0, 0, 0, 1),
+ c(0, 0, -1, 0), c(0, 0, 0, -1), c(0, 0, -1, -1))
+ci = c(0, 0, 0, 0, -1, -1, -1)
+
+EMres = EM(theta.null = c(5, 1, 0.33, 0.33), x.syn = mutations$Syn, x.non = mutations$Non, cvec=c(c1, c2, c3), iter=25, epsilon = 10^(-8), ui = ui, ci=ci)
+matplot(EMres$theta, t="b")
+plot(EMres$loglikelihood, t="b")
 }
 \author{
 Johanna Bertl

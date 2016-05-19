@@ -1,8 +1,13 @@
 #' Wrapper function with random starting values for the EM algorithm
 #'
-#' The function EM is called multiple times, each time with a random starting value drawn from a uniform distribution on a user-defined hypercube.
+#' The function EM is called multiple times, each time with a random starting value
 #'
-#' @param theta.null 3x2 matrix, with minimal value in column one, maximal value in column 2, alpha, beta, p1 in lines 1-3.
+#' The starting values for the parameters alpha and beta are drawn from a uniform distribution on two user-defined intervals. The starting values for p1, ..., pk-1 are drawn from a multinomial distribution. The variance of the multinomial distribution is determined by the parameter \code{precision}: a multinomial sample of the size \code{precision} is drawn with the function \code{rmultinom}, afterwards the multinomial sample is scaled to sum up to one. The larger \code{precision}, the smaller the variance.
+#'
+#' @param alpha.interval
+#' @param beta.interval
+#' @param pvec vector of length k-1
+#' @param precision positive integer to determine the variance of the multinomial draws (see details).
 #' @param nstart Integer. Number of random starting values
 #' @param parallel Logical. If true, the function mclapply is used for parallelization. Only makes sense when multiple cores are available.
 #'
@@ -34,27 +39,46 @@
 #' ci = c(0, 0, 0, -1)
 #'
 #' # Starting values
-#' theta.null = matrix(c(1, 1, 0.05, 20, 10, 0.5), ncol=2, nrow=3, byrow=F)
+#' alpha.interval = c(1, 20)
+#' beta.interval = c(1, 10)
+#' pvec = p1
+#' precision=20
 #' nstart = 5
 #'
 #' # Run EM algorithm
-#' EMres = EM_random(theta.null = theta.null, nstart=nstart, x.syn = mutations$Syn, x.non = mutations$Non, c1 = c1, c2 = c2, iter=25, ui = ui, ci=ci, parallel=T)
+#' EMres = EM_random(alpha.interval = alpha.interval, beta.interval = beta.interval, pvec = pvec, precision = precision, nstart=nstart, x.syn = mutations$Syn, x.non = mutations$Non, cvec=c(c1, c2), iter=25, ui = ui, ci=ci, parallel=T)
 #'
 #' # Plot results
 #' par(mfrow=c(3,2))
 #'  for(i in 1:5) matplot(EMres[[i]]$theta, t="l")
 #' par(mfrow=c(1,1))
 
-EM_random = function(theta.null, nstart, x.syn, x.non, c1, c2, iter, ui, ci, parallel=F) {
+EM_random = function(alpha.interval, beta.interval, pvec, precision, nstart, x.syn, x.non, cvec, iter, epsilon=NULL, ui, ci, parallel=F) {
 
-  start = matrix(NA, nrow=nstart, ncol=3)
-  for(i in 1:3) start[,i] = runif(nstart, min = theta.null[i,1], max = theta.null[i, 2])
+  # prepare matrix for starting values
+  k = length(pvec) + 3
+  start = matrix(NA, nrow=nstart, ncol=k)
+
+  # make sure pvec is a valid probability vector
+  if(sum(pvec)>=1 | !(all(pvec>0))){
+    stop("pvec is not a valid probability vector.")
+  }
+  #!# further checks
+
+  # simulate starting values
+  # alpha:
+  start[,1] = runif(nstart, min = alpha.interval[1], max = alpha.interval[2])
+  # beta:
+  start[,2] = runif(nstart, min = beta.interval[1], max = beta.interval[2])
+  # p:
+  start[,3:k] = t(rmultinom(nstart, size=precision, prob = c(pvec, 1-sum(pvec)))/precision)
+
 
   if(parallel){
     startlist = vector("list", nstart)
-    for(i in 1:nstart) startlist[[i]] = start[i,]
-    mclapply(startlist, EM, x.syn, x.non, c1, c2, iter, ui, ci)
+    for(i in 1:nstart) startlist[[i]] = start[i,1:(k-1)]
+    mclapply(startlist, EM, x.syn, x.non, cvec, iter, epsilon, ui, ci)
   } else {
-    apply(start, 1, EM, x.syn, x.non, c1, c2, iter, ui, ci)
+    apply(start, 1, EM, x.syn, x.non, cvec, iter, epsilon, ui, ci)
   }
 }

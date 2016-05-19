@@ -2,30 +2,53 @@
 % Please edit documentation in R/Q.R
 \name{Q}
 \alias{Q}
-\title{The function Q for the negative binomial mixture model}
+\title{The function Q for the EM algorithm for the negative binomial mixture model}
 \usage{
-Q(theta, theta.prime, x.syn, x.non, c1, c2)
+Q(theta, theta.prime, x.syn, x.non, cvec)
 }
 \arguments{
-\item{theta}{c(alpha, beta, p1)}
+\item{theta}{c(alpha, beta, p1, p2, ..., pk-1)}
 
-\item{theta.prime}{c(alpha.prime, beta.prime, p1.prime)}
+\item{theta.prime}{c(alpha.prime, beta.prime, p1.prime, p2.prime, ..., p(k-1).prime)}
 
 \item{x.syn}{vector of synonymous mutation count}
 
 \item{x.non}{vector of non-synonymous mutation count}
 
-\item{c1}{positive scalar}
-
-\item{c2}{positive scalar}
+\item{cvec}{vector of k positive values c(c1, ..., ck)}
 }
 \description{
-Currently only for mixtures of 2 negbinoms.
+The function negQ = -Q can be used for minimization.
 }
-\details{
-The function negQ is -Q (for minimization).
+\examples{
+### Example with 2 components ###
 
-The function Q_fixed_prop is for the function EM_fixed_prop, where the mixture proportions are assumed fixed. Here, theta = c(alpha, beta).
+# Simulate dataset of synonymous and non-synonymous mutations
+
+c1 = 0.5; c2 = 10
+p1 = 0.2; p2 = 0.8
+alpha = 10
+beta = 5
+
+mutations = rnegbinmix_syn_nonsyn(n=3000, alpha=alpha, beta=beta, c=c(c1, c2), p = c(p1, p2))
+
+# Q
+
+Qtest = Q(theta = c(5, 1, 0.5), theta.prime = c(5, 1, 0.5), x.syn = mutations$Syn, x.non = mutations$Non, c = c(c1, c2))
+
+
+### Example with 3 components ###
+
+c1 = 0.01; c2 = 1; c3 = 100
+p1 = 0.33; p2 = 0.33; p3 = 0.34
+alpha = 10
+beta = 5
+
+mutations = rnegbinmix_syn_nonsyn(n=3000, alpha=alpha, beta=beta, c=c(c1, c2, c3), p = c(p1, p2, p3))
+
+# Q
+
+Qtest = Q(theta = c(5, 1, 0.3, 0.3), theta.prime = c(5, 1, 0.3, 0.3), x.syn = mutations$Syn, x.non = mutations$Non, c = c(c1, c2, c3))
 }
 \author{
 Johanna Bertl
