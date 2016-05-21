@@ -29,7 +29,7 @@ A list consisting of \code{nstart} objects, each one a list just like the output
 The function EM is called multiple times, each time with a random starting value
 }
 \details{
-The starting values for the parameters alpha and beta are drawn from a uniform distribution on two user-defined intervals. The starting values for p1, ..., pk-1 are drawn from a multinomial distribution. The variance of the multinomial distribution is determined by the parameter \code{precision}: a multinomial sample of the size \code{precision} is drawn with the function \code{rmultinom}, afterwards the multinomial sample is scaled to sum up to one. The larger \code{precision}, the smaller the variance.
+The starting values for the parameters alpha and beta are drawn from a uniform distribution on two user-defined intervals. The starting values for p1, ..., pk-1 are drawn from a multinomial distribution. The variance of the multinomial distribution is determined by the parameter \code{precision}: a multinomial sample of the size \code{precision} is drawn with the function \code{rmultinom}, afterwards the multinomial sample is scaled to sum up to one. The larger \code{precision}, the smaller the variance. To make sure that no entry of the vector is zero, a pseudo count of 0.05 is added to each component before scaling.
 }
 \examples{
 # Simulate dataset of synonymous and non-synonymous mutations

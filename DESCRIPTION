@@ -7,5 +7,5 @@ Author: Johanna Bertl
 Maintainer: Johanna Bertl <johanna.bertl@clin.au.dk>
 Description: Simulation and estimation in a negative binomial mixture model for mutation counts
 LazyData: TRUE
-Depends: parallel
+Depends: parallel, MASS
 License: None
