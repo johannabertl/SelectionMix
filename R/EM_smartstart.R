@@ -9,6 +9,8 @@
 #' In the M step of both EM algorithms, constrained optimization is conducted with the function \code{constrOptim}. \code{ui} and \code{ci} are defined accordingly (see \link{constrOptim}): \code{ui \%*\% theta - ci >= 0}. It is important that ui and ci are specified such that p is a probability vector, see examples. It is not allowed to specify constraints that affect (alpha and beta) and (p1, ..., pk-1) jointly.
 #'
 #' As a stopping criterion, the difference in log-likelihood can be used. To make sure that there is always at least a short trajectory for visual checks, the criterion is only used after at least 5 iterations.
+#' 
+#' The function EM_smartstart_apply can be used to run the algorithm on a list of datasets (e. g. using mclapply for parallel execution).
 #'
 #' @param theta.null Starting values for the parameters p1, ..., pk-1 in EM1.
 #' @param x.syn Vector of synonymous mutation counts per gene.
@@ -110,7 +112,7 @@ EM_smartstart = function(theta.null, x.syn, x.non, cvec, iter1, iter2, epsilon1=
 
   EM_start = EM_proportions(theta.null = theta.null, x.non = x.non, alpha=alpha.start, beta = beta.start, cvec=cvec, iter=iter1, epsilon = epsilon1, ui = ui1, ci=ci1)
   #!# avoid one-dimensional optimization by Nelder-Mead (warning says "Brent" is more reliable)
-  p.start = EM_start$theta[iter1,]
+  p.start = as.matrix(EM_start$theta)[length(EM_start$Q),]
 
   ### starting values ###
   start = c(alpha.start, beta.start, p.start)
@@ -125,4 +127,9 @@ EM_smartstart = function(theta.null, x.syn, x.non, cvec, iter1, iter2, epsilon1=
     return(EM_final)
   }
 
+}
+
+
+EM_smartstart_apply = function(x, theta.null, cvec, iter1, iter2, epsilon1, epsilon2, ui, ci, full.output){
+  EM_smartstart(theta.null=theta.null, x.syn=x$Syn, x.non=x$Non, cvec=cvec, iter1=iter1, iter2=iter2, epsilon1=epsilon1, epsilon2=epsilon2, ui=ui, ci=ci, full.output=full.output)
 }
