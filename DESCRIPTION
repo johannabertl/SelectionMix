@@ -9,3 +9,4 @@ Description: Simulation and estimation in a negative binomial mixture model for 
 LazyData: TRUE
 Depends: parallel, MASS
 License: None
+RoxygenNote: 6.0.1

@@ -41,6 +41,9 @@
 #' plot(k, density2, t="b")
 #' density.mixture = p1 * density1 + p2 * density2
 #' plot(k, density.mixture, t="b")
+#' 
+#' density.mixture2 = dnegbinmix(k = k, alpha = alpha, beta = beta, cvec = c(c1, c2), p = c(p1, p2))
+#' lines(k, density.mixture2, col="red")
 #'
 #' simulated.mixture = rnegbinmix(1000, alpha = alpha, beta = beta, c = c(c1, c2), p = c(p1, p2))
 #' plot(table(simulated.mixture)/1000)
@@ -84,6 +87,28 @@ rnegbinmix = function(n, alpha, beta, c, p){
   pi = sample(x = c, size=n, replace=T, prob = p)
   # simulate from the negative binomial mixture distribution
   rnegbin.alphabeta(n, alpha, beta/pi)
+}
+
+
+dnegbinmix = function(k, alpha, beta, cvec, p){
+  if(!all(p>0)){
+    stop("All entries of p must be positive.")
+  }
+  if(length(p)!=length(cvec)){
+    stop("p and c must have the same length.")
+  }
+  if(sum(p) !=1 ) {
+    p = p/sum(p)
+    warning("p was scaled such that sum(p)=1.")
+  }
+  
+  densmat = matrix(NA, ncol=length(cvec), nrow=length(k))
+  for(i in 1:length(cvec)){
+    densmat[,i] = dnegbin.alphabeta(k, alpha, beta/cvec[i])
+  }
+  pmat = matrix(p, ncol=length(cvec), nrow=length(k), byrow=T)
+  rowSums(densmat*pmat)
+  
 }
 
 

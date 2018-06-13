@@ -22,7 +22,7 @@
 #' @param epsilon2 Stopping criterion for EM2. If NULL, the maximum number of iterations is used.
 #' @param ui Constraints on the parameters. See details.
 #' @param ci Constraints on the parameters. See details.
-#' @param full.output logical. If T, the results of the ML estimation and EM1 are output. Otherwise, only the output of EM2 is output (in the same format as by the function \link{\code{EM}}).
+#' @param full.output logical. If T, the results of the ML estimation and EM1 are output. Otherwise, only the output of EM2 is output (in the same format as by the function \code{\link{EM}}).
 #'
 #' @seealso
 #'
