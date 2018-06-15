@@ -7,7 +7,9 @@
 rnegbinmix(n, alpha, beta, c, p)
 }
 \arguments{
-\item{alpha, }{scalar, positive}
+\item{n}{scalar, positive. number of samples}
+
+\item{alpha}{scalar, positive}
 
 \item{beta}{positive}
 

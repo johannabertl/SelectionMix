@@ -4,13 +4,11 @@
 #'
 #' The function \code{rnegbin} from package MASS is used for the simulation of negative binomial data.
 #'
-#'
-#' @param n
-#' @param alpha, scalar, positive
+#' @param n scalar, positive. number of samples
+#' @param alpha scalar, positive
 #' @param beta positive
 #' @param c numeric, positive, length k
 #' @param p numeric, probability vector, length k
-#'
 #'
 #' @author Johanna Bertl
 #'
@@ -41,7 +39,7 @@
 #' plot(k, density2, t="b")
 #' density.mixture = p1 * density1 + p2 * density2
 #' plot(k, density.mixture, t="b")
-#' 
+#'
 #' density.mixture2 = dnegbinmix(k = k, alpha = alpha, beta = beta, cvec = c(c1, c2), p = c(p1, p2))
 #' lines(k, density.mixture2, col="red")
 #'
@@ -80,7 +78,7 @@ rnegbinmix = function(n, alpha, beta, c, p){
   }
   if(sum(p) !=1 ) {
     p = p/sum(p)
-    warning("p was scaled such that sum(p)=1.")
+    warning("p has been scaled such that sum(p)=1.")
   }
 
   # simulate pi (for the mixing)
@@ -101,14 +99,14 @@ dnegbinmix = function(k, alpha, beta, cvec, p){
     p = p/sum(p)
     warning("p was scaled such that sum(p)=1.")
   }
-  
+
   densmat = matrix(NA, ncol=length(cvec), nrow=length(k))
   for(i in 1:length(cvec)){
     densmat[,i] = dnegbin.alphabeta(k, alpha, beta/cvec[i])
   }
   pmat = matrix(p, ncol=length(cvec), nrow=length(k), byrow=T)
   rowSums(densmat*pmat)
-  
+
 }
 
 
