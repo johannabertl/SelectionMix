@@ -51,6 +51,7 @@ plot(betavec, llbeta, t="b")
 abline(v=beta, col="red")
 plot(p1vec, llp1, t="b")
 abline(v=p1, col="red")
+
 }
 \author{
 Johanna Bertl

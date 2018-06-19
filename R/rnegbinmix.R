@@ -1,13 +1,14 @@
-#' Simulating data from a negative binomial mixture distribution
+#' The negative binomial mixture distribution with k components
 #'
-#' rnegbinmix simulates data from a negative binomial mixture distribution with k components.
+#' rnegbinmix simulates data from a negative binomial mixture distribution and dnegbinmix computes the density.
 #'
-#' The function \code{rnegbin} from package MASS is used for the simulation of negative binomial data.
+#'
+#' dnegbinmix can handle non-integer counts (without warning), because the binomial coefficient is implemented with a gamma function.
 #'
 #' @param n scalar, positive. number of samples
 #' @param alpha scalar, positive
 #' @param beta positive
-#' @param c numeric, positive, length k
+#' @param cvec numeric, positive, length k
 #' @param p numeric, probability vector, length k
 #'
 #' @author Johanna Bertl
@@ -43,7 +44,7 @@
 #' density.mixture2 = dnegbinmix(k = k, alpha = alpha, beta = beta, cvec = c(c1, c2), p = c(p1, p2))
 #' lines(k, density.mixture2, col="red")
 #'
-#' simulated.mixture = rnegbinmix(1000, alpha = alpha, beta = beta, c = c(c1, c2), p = c(p1, p2))
+#' simulated.mixture = rnegbinmix(1000, alpha = alpha, beta = beta, cvec = c(c1, c2), p = c(p1, p2))
 #' plot(table(simulated.mixture)/1000)
 #' lines(k, density.mixture, col="purple")
 #'
@@ -65,15 +66,17 @@
 #' density.mixture = p1 * density1 + p2 * density2 + p3 * density3
 #' plot(k, density.mixture, t="l")
 #'
-#' simulated.mixture = rnegbinmix(1000, alpha = alpha, beta = beta, c = c(c1, c2, c3), p = c(p1, p2, p3))
+#' simulated.mixture = rnegbinmix(1000, alpha = alpha, beta = beta, cvec = c(c1, c2, c3), p = c(p1, p2, p3))
 #' plot(table(simulated.mixture)/1000)
 #' lines(k, density.mixture, col="purple")
+#'
+#' @export
 
-rnegbinmix = function(n, alpha, beta, c, p){
+rnegbinmix = function(n, alpha, beta, cvec, p){
   if(!all(p>0)){
     stop("All entries of p must be positive.")
   }
-  if(length(p)!=length(c)){
+  if(length(p)!=length(cvec)){
     stop("p and c must have the same length.")
   }
   if(sum(p) !=1 ) {
@@ -82,12 +85,13 @@ rnegbinmix = function(n, alpha, beta, c, p){
   }
 
   # simulate pi (for the mixing)
-  pi = sample(x = c, size=n, replace=T, prob = p)
+  pi = sample(x = cvec, size=n, replace=T, prob = p)
   # simulate from the negative binomial mixture distribution
   rnegbin.alphabeta(n, alpha, beta/pi)
 }
 
-
+#' @rdname rnegbinmix
+#' @export
 dnegbinmix = function(k, alpha, beta, cvec, p){
   if(!all(p>0)){
     stop("All entries of p must be positive.")
@@ -110,17 +114,3 @@ dnegbinmix = function(k, alpha, beta, cvec, p){
 }
 
 
-dnegbin = function(k, r, p){
-  choose(k + r - 1, k)*((1 - p)**r)*(p**k)
-}
-
-dnegbin.alphabeta = function(k, alpha, beta){
-  dnegbin(k, r = alpha, p = 1/(beta + 1))
-}
-
-rnegbin.alphabeta = function(n, alpha, beta){
-  # simulate lamda from a Gamma distribution
-  lambda = rgamma(n, shape = alpha, rate = beta)
-  # simulate negative binomial from a Poisson(lambda) distribution
-  rpois(n, lambda)
-}

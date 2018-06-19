@@ -1,6 +1,6 @@
 #' The (incomplete data) loglikelihood function for the parameters p1, ..., pk-1 of the negative binomial mixture model
 #'
-#' The parameters alpha and beta are known.#'
+#' The parameters alpha and beta are known.
 #'
 #' @param theta c(p1, p2, ..., pk-1)
 #' @param x.non vector of non-synonymous mutation count
@@ -31,6 +31,8 @@
 #'
 #' plot(p1vec, llp1, t="b")
 #' abline(v=p1, col="red")
+#'
+#' @export
 
 loglikelihood_proportions = function(theta, x.non, alpha, beta, cvec){
 

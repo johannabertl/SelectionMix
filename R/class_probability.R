@@ -28,6 +28,7 @@
 #' # class with the highest probability:
 #' prob_max = apply(prob_mat, 1, which.max)
 #'
+#' @export
 class_probabilities = function(x.non, theta, cvec){
 
   if(length(x.non)>1){

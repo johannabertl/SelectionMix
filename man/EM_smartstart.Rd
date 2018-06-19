@@ -99,6 +99,8 @@ ci = c(rep(0, 5), rep(-1, 4))
 EMtest = EM_smartstart(theta.null = c(0.25, 0.25, 0.25), x.syn = mutations$Syn, x.non = mutations$Non, cvec=cvec, iter1=10, iter2=50, epsilon2 = 10^(-8), ui = ui, ci=ci, full.output=T)
 matplot(EMtest$EM_final$theta, t="b")
 plot(EMtest$EM_final$loglikelihood, t="b")
+
+
 }
 \seealso{
 MASS::fitdistr

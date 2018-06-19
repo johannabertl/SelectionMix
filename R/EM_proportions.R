@@ -101,6 +101,9 @@
 #' EMres = EM(theta.null = c(5, 1, 0.33, 0.33), x.syn = mutations$Syn, x.non = mutations$Non, cvec=c(c1, c2, c3), iter=25, epsilon = 10^(-8), ui = ui, ci=ci)
 #' matplot(EMres$theta, t="b")
 #' plot(EMres$loglikelihood, t="b")
+#'
+#'
+#' @export
 
 
 EM_proportions = function(theta.null, x.non, alpha, beta, cvec, iter, epsilon=NULL, ui, ci){

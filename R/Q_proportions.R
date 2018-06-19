@@ -11,6 +11,8 @@
 #' @param cvec vector of k positive values c(c1, ..., ck)
 #'
 #' @author Johanna Bertl
+#'
+#' @export
 
 Q_proportions = function(theta, theta.prime, x.non, alpha, beta, cvec){
 

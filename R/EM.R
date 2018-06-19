@@ -62,6 +62,15 @@
 #' plot(EMres$loglikelihood, t="b")
 #'
 #'
+#' ### Example with 2 components and non-integer values ###
+#' # Usually, the mutation counts are integer values. If they have been corrected, e. g. for gene length, they might not be integers.
+#'
+#' # EM algorithm
+#' EMres_nonint = EM(theta.null = c(5, 1, 0.5), x.syn = mutations$Syn + 0.25, x.non = mutations$Non + 0.25, cvec=c(c1, c2), iter=25, epsilon = 10^(-8), ui = ui, ci=ci)
+#' matplot(EMres_nonint$theta, t="b")
+#' plot(EMres_nonint$loglikelihood, t="b")
+#'
+#'
 #' ### Example with 3 components ####
 #'
 #' c1 = 0.01; c2 = 1; c3 = 100
@@ -87,6 +96,8 @@
 #' EMres = EM(theta.null = c(5, 1, 0.33, 0.33), x.syn = mutations$Syn, x.non = mutations$Non, cvec=c(c1, c2, c3), iter=25, epsilon = 10^(-8), ui = ui, ci=ci)
 #' matplot(EMres$theta, t="b")
 #' plot(EMres$loglikelihood, t="b")
+#'
+#' @export
 
 
 EM = function(theta.null, x.syn, x.non, cvec, iter, epsilon=NULL, ui, ci){

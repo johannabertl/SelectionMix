@@ -33,6 +33,7 @@ alpha = 10
 beta = 5
 
 simulated.mixture = rnegbinmix_syn_nonsyn(1000, alpha = alpha, beta = beta, c = c(c1, c2, c3), p = c(p1, p2, p3))
+
 }
 \author{
 Johanna Bertl

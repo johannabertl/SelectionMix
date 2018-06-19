@@ -9,7 +9,7 @@
 #' In the M step of both EM algorithms, constrained optimization is conducted with the function \code{constrOptim}. \code{ui} and \code{ci} are defined accordingly (see \link{constrOptim}): \code{ui \%*\% theta - ci >= 0}. It is important that ui and ci are specified such that p is a probability vector, see examples. It is not allowed to specify constraints that affect (alpha and beta) and (p1, ..., pk-1) jointly.
 #'
 #' As a stopping criterion, the difference in log-likelihood can be used. To make sure that there is always at least a short trajectory for visual checks, the criterion is only used after at least 5 iterations.
-#' 
+#'
 #' The function EM_smartstart_apply can be used to run the algorithm on a list of datasets (e. g. using mclapply for parallel execution).
 #'
 #' @param theta.null Starting values for the parameters p1, ..., pk-1 in EM1.
@@ -83,8 +83,9 @@
 #' EMtest = EM_smartstart(theta.null = c(0.25, 0.25, 0.25), x.syn = mutations$Syn, x.non = mutations$Non, cvec=cvec, iter1=10, iter2=50, epsilon2 = 10^(-8), ui = ui, ci=ci, full.output=T)
 #' matplot(EMtest$EM_final$theta, t="b")
 #' plot(EMtest$EM_final$loglikelihood, t="b")
-
-
+#'
+#'
+#' @export
 
 EM_smartstart = function(theta.null, x.syn, x.non, cvec, iter1, iter2, epsilon1=NULL, epsilon2=NULL, ui, ci, full.output=F){
 

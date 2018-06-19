@@ -50,6 +50,7 @@ mutations = rnegbinmix_syn_nonsyn(n=3000, alpha=alpha, beta=beta, c=c(c1, c2, c3
 # Q
 
 Qtest = Q(theta = c(5, 1, 0.3, 0.3), theta.prime = c(5, 1, 0.3, 0.3), x.syn = mutations$Syn, x.non = mutations$Non, c = c(c1, c2, c3))
+
 }
 \author{
 Johanna Bertl

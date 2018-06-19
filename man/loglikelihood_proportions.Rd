@@ -14,7 +14,7 @@ loglikelihood_proportions(theta, x.non, alpha, beta, cvec)
 \item{cvec}{vector of k positive values c(c1, ..., ck)}
 }
 \description{
-The parameters alpha and beta are known.#'
+The parameters alpha and beta are known.
 }
 \examples{
 
@@ -37,6 +37,7 @@ for(i in 1:20){
 
 plot(p1vec, llp1, t="b")
 abline(v=p1, col="red")
+
 }
 \author{
 Johanna Bertl

@@ -2,9 +2,12 @@
 % Please edit documentation in R/rnegbinmix.R
 \name{rnegbinmix}
 \alias{rnegbinmix}
-\title{Simulating data from a negative binomial mixture distribution}
+\alias{dnegbinmix}
+\title{The negative binomial mixture distribution with k components}
 \usage{
-rnegbinmix(n, alpha, beta, c, p)
+rnegbinmix(n, alpha, beta, cvec, p)
+
+dnegbinmix(k, alpha, beta, cvec, p)
 }
 \arguments{
 \item{n}{scalar, positive. number of samples}
@@ -13,15 +16,15 @@ rnegbinmix(n, alpha, beta, c, p)
 
 \item{beta}{positive}
 
-\item{c}{numeric, positive, length k}
+\item{cvec}{numeric, positive, length k}
 
 \item{p}{numeric, probability vector, length k}
 }
 \description{
-rnegbinmix simulates data from a negative binomial mixture distribution with k components.
+rnegbinmix simulates data from a negative binomial mixture distribution and dnegbinmix computes the density.
 }
 \details{
-The function \code{rnegbin} from package MASS is used for the simulation of negative binomial data.
+dnegbinmix can handle non-integer counts (without warning), because the binomial coefficient is implemented with a gamma function.
 }
 \examples{
 
@@ -54,7 +57,7 @@ plot(k, density.mixture, t="b")
 density.mixture2 = dnegbinmix(k = k, alpha = alpha, beta = beta, cvec = c(c1, c2), p = c(p1, p2))
 lines(k, density.mixture2, col="red")
 
-simulated.mixture = rnegbinmix(1000, alpha = alpha, beta = beta, c = c(c1, c2), p = c(p1, p2))
+simulated.mixture = rnegbinmix(1000, alpha = alpha, beta = beta, cvec = c(c1, c2), p = c(p1, p2))
 plot(table(simulated.mixture)/1000)
 lines(k, density.mixture, col="purple")
 
@@ -76,9 +79,10 @@ plot(k, density3, t="l")
 density.mixture = p1 * density1 + p2 * density2 + p3 * density3
 plot(k, density.mixture, t="l")
 
-simulated.mixture = rnegbinmix(1000, alpha = alpha, beta = beta, c = c(c1, c2, c3), p = c(p1, p2, p3))
+simulated.mixture = rnegbinmix(1000, alpha = alpha, beta = beta, cvec = c(c1, c2, c3), p = c(p1, p2, p3))
 plot(table(simulated.mixture)/1000)
 lines(k, density.mixture, col="purple")
+
 }
 \author{
 Johanna Bertl
